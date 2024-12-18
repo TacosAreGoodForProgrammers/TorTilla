@@ -1,4 +1,170 @@
 .
+├── .git
+│   ├── COMMIT_EDITMSG
+│   ├── HEAD
+│   ├── branches
+│   │   └── .gitkeep
+│   ├── config
+│   ├── description
+│   ├── hooks
+│   │   ├── applypatch-msg.sample
+│   │   ├── commit-msg.sample
+│   │   ├── fsmonitor-watchman.sample
+│   │   ├── post-update.sample
+│   │   ├── pre-applypatch.sample
+│   │   ├── pre-commit.sample
+│   │   ├── pre-merge-commit.sample
+│   │   ├── pre-push.sample
+│   │   ├── pre-rebase.sample
+│   │   ├── pre-receive.sample
+│   │   ├── prepare-commit-msg.sample
+│   │   ├── push-to-checkout.sample
+│   │   ├── sendemail-validate.sample
+│   │   └── update.sample
+│   ├── index
+│   ├── info
+│   │   └── exclude
+│   ├── logs
+│   │   ├── HEAD
+│   │   └── refs
+│   │       ├── heads
+│   │       │   ├── main
+│   │       │   └── master
+│   │       └── remotes
+│   │           └── origin
+│   │               └── main
+│   ├── objects
+│   │   ├── 00
+│   │   │   ├── 334af11990befc6a3a0d3077d97cc5b423c438
+│   │   │   └── 439f9c9f736c938e50ff1be6319cd5c74e8dc5
+│   │   ├── 05
+│   │   │   └── 1cd4dd9bbd2852755b62587228de3a0490b529
+│   │   ├── 0c
+│   │   │   └── 1505e8816a58206074ea345e505e1df138e82e
+│   │   ├── 0f
+│   │   │   └── 870d8e36de265f32e7796f01c6767fd18a1ce3
+│   │   ├── 14
+│   │   │   └── 4e5f8b1f09a60a678982310938d852865951d9
+│   │   ├── 15
+│   │   │   └── f537d807e53138a1bb56dc44aa65a730ef0767
+│   │   ├── 18
+│   │   │   └── 98a2b1c0beb63072accb4e8c467bef15716217
+│   │   ├── 1d
+│   │   │   └── c15fb565e2b56d0ff50e0289bfba9710b44728
+│   │   ├── 23
+│   │   │   └── 18c342d88d70e0547ae1632ae0060047c8e18a
+│   │   ├── 24
+│   │   │   ├── 2d28bb4a7e75a500f5b11b971b9b91766b0db4
+│   │   │   └── 3630cef77f0474020bb8b77dea60241c910bf9
+│   │   ├── 25
+│   │   │   └── 2b21e7698b8b295f3b42a65de11c5587de970b
+│   │   ├── 2e
+│   │   │   └── 52ed6b39bafb1c33aaf3272582634780f26b9e
+│   │   ├── 33
+│   │   │   └── 291589d9b4b8759ee8a7506091c883c5431b39
+│   │   ├── 40
+│   │   │   └── fae2f78a666cf7f6956c0f5f03e7aed27a44dc
+│   │   ├── 43
+│   │   │   └── 200b7b61b43d35294837b491f14b081cb6cb87
+│   │   ├── 4b
+│   │   │   └── e8cc9933bf41ca0597c4f98ff8979fd0d33bf1
+│   │   ├── 50
+│   │   │   ├── 5ab24f8dff7280f6605b205777b10340cb2ff2
+│   │   │   └── e2e9cac4c4dc390c0ba82c4768ec84ef7181a8
+│   │   ├── 51
+│   │   │   └── 4ce88354bb6e0c87e3b4d880c390d189d44997
+│   │   ├── 55
+│   │   │   └── fdfc0df133ed90b9ab6ae7960a15f0c1a5bf80
+│   │   ├── 59
+│   │   │   ├── 360550676086039c14f9874cae64803c659ddd
+│   │   │   └── 68ad770ccc68b2b8cdde64319de3705a2b152c
+│   │   ├── 69
+│   │   │   └── ecc60a0107ba90764c7d29607f9f96fca7d498
+│   │   ├── 6e
+│   │   │   ├── 52e2888414aed6f3e37973e3b3cf0690724ba1
+│   │   │   └── 54ee0edeb55a88714c89b1e946244cb03625d6
+│   │   ├── 6f
+│   │   │   └── 581e5ae752c6d8720c986361c787b109ecbfcb
+│   │   ├── 76
+│   │   │   └── cfec467b4148458a90eb4aedbc59698c724700
+│   │   ├── 7c
+│   │   │   └── 16e29be1d404a45e2d476fca1d5afafaa847a1
+│   │   ├── 7f
+│   │   │   └── ded059e2858e4dd793ce40f6332baca92dbdc0
+│   │   ├── 80
+│   │   │   └── 4585ee82d7b4a4f76df790f932c1968e6ba8af
+│   │   ├── 81
+│   │   │   └── 11c83262903d5b584e05f7aa6d0e4ebb6e269e
+│   │   ├── 82
+│   │   │   └── be159ff25ec06e4f57c1f70e9c21e2cf1a40ed
+│   │   ├── 89
+│   │   │   └── fad3cb69e98bc0fec67becdd786efc70a91788
+│   │   ├── 93
+│   │   │   └── a20266ec928ff9e8283eb441a8293004be805d
+│   │   ├── 94
+│   │   │   └── 006fe15336a90390360739695095642c753445
+│   │   ├── 97
+│   │   │   └── b5dce6cc318fbfab6a528a6c905d31b53bf7b9
+│   │   ├── 9d
+│   │   │   └── b04fd602689b82cf7376b019cbcc1cef356573
+│   │   ├── a9
+│   │   │   └── 2ddd4a51535247efff8ad13318a282f960fb2a
+│   │   ├── af
+│   │   │   └── 230c72c06f060138a98b549cc1dbd241e586a3
+│   │   ├── b3
+│   │   │   └── 53df670fad7816cb9e8d4953261f982b52a100
+│   │   ├── bd
+│   │   │   └── bd91155562ec70d5183a57eb0541b9c1b428c6
+│   │   ├── bf
+│   │   │   └── e232c2304112a02f68e4d9b3f212a0f46d697f
+│   │   ├── c7
+│   │   │   └── aa6d552544a71c2dca2528eb057b3dbc829c6f
+│   │   ├── c8
+│   │   │   └── bdcc7515529202a584789a0d3cd3667172a621
+│   │   ├── d5
+│   │   │   └── 64d0bc3dd917926892c55e3706cc116d5b165e
+│   │   ├── d7
+│   │   │   └── d84c2a9e44791c159075297ea7a2d139fd1f44
+│   │   ├── de
+│   │   │   └── b0d9685b17b352600fc6950505c1296e34f5c4
+│   │   ├── e1
+│   │   │   └── 855c62f18e549f783198df67bc2c9ecfec9709
+│   │   ├── e2
+│   │   │   └── 406851209e92e9aa3eacf86e1581153b37929d
+│   │   ├── e6
+│   │   │   └── 9de29bb2d1d6434b8b29ae775ad8c2e48c5391
+│   │   ├── e8
+│   │   │   └── c11e036c4c6e436e33716559e86094f6f5124e
+│   │   ├── ea
+│   │   │   └── 9a6a320789f3835d3d644fd712dd49143f8e3e
+│   │   ├── eb
+│   │   │   └── 1bfffa68d5a9b2ea72d72553c8d613e48abc53
+│   │   ├── f5
+│   │   │   └── 240816322e3ac7a1f94b3405a67f4a9aeb83f8
+│   │   ├── f7
+│   │   │   └── b6fc9d762d034f8ddabe3863cc7ff54517d3b2
+│   │   ├── f8
+│   │   │   └── 425ad434cca69d24aafa13edf61a158e2756e8
+│   │   ├── fa
+│   │   │   └── 02b4ed361275a7c42b61ff00a79d96982b24ce
+│   │   ├── fb
+│   │   │   └── 7e4998233e22774d8844bfb838ef6e24cb77e5
+│   │   ├── fd
+│   │   │   └── afd05e63798aa0b4a17bcb1a45e62bc81da130
+│   │   ├── info
+│   │   │   └── .gitkeep
+│   │   └── pack
+│   │       └── .gitkeep
+│   └── refs
+│       ├── heads
+│       │   ├── .gitkeep
+│       │   ├── main
+│       │   └── master
+│       ├── remotes
+│       │   └── origin
+│       │       └── main
+│       └── tags
+│           └── .gitkeep
 ├── Arch
 │   ├── arm
 │   │   ├── stage1
@@ -9,6 +175,8 @@
 │   │       └── .gitkeep
 │   └── x86
 │       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
 │       │   └── seed.s
 │       ├── stage2(pit)
 │       │   └── .gitkeep
@@ -18,10 +186,12 @@
 ├── README.md
 ├── assets
 │   ├── full_tree.log
-│   ├── mascot.jpg
-│   ├── mascot.png
-│   ├── mascot.svg
-│   ├── mascot_ascii.txt
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
 │   └── tree.log
 ├── common
 │   ├── stage1
@@ -33,4 +203,4 @@
 └── uefi
     └── .gitkeep
 
-56 directories, 71 files
+91 directories, 113 files

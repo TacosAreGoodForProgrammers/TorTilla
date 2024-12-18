@@ -43,12 +43,22 @@ Avocado is a avocado-themed, multi-stage, multiboot-compliant bootloader designe
 │   │   ├── stage2
 │   │   └── stage3
 │   └── x86
-│       ├── stage1
-│       ├── stage2
-│       └── stage3
+│       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       └── stage3(flesh)
+│           └── f
 ├── README.md
 ├── assets
-│   ├── mascot.svg
+│   ├── full_tree.log
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
 │   └── tree.log
 ├── common
 │   ├── stage1
@@ -56,8 +66,6 @@ Avocado is a avocado-themed, multi-stage, multiboot-compliant bootloader designe
 │   └── stage3
 └── uefi
 
-16 directories, 3 files
-
-
+18 directories, 11 files
 
 ```
