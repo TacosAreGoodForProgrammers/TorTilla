@@ -13,10 +13,11 @@
 ├── README.md
 ├── assets
 │   ├── full_tree.log
-│   ├── mascot.jpg
-│   ├── mascot.png
-│   ├── mascot.svg
-│   ├── mascot_ascii.txt
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   └── mascot_ascii.txt
 │   └── tree.log
 ├── common
 │   ├── stage1
@@ -24,4 +25,4 @@
 │   └── stage3
 └── uefi
 
-17 directories, 8 files
+18 directories, 8 files
