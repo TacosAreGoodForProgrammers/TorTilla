@@ -1,6 +1,6 @@
 # Avocado Bootloader
 
-![Avocado Mascot](./assets/mascot.svg)  
+![Avocado Mascot](./assets/mascot/mascot.svg)  
 *The multi-stage, multi-boot bootloader with UEFI support!*
 
 ## Overview
