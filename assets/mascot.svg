@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 200 200"
+   width="200"
+   height="200"
+   version="1.1"
+   id="svg3"
+   sodipodi:docname="mascot.svg"
+   inkscape:version="1.4 (86a8ad7, 2024-10-11)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs3" />
+  <sodipodi:namedview
+     id="namedview3"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="3.865"
+     inkscape:cx="124.70893"
+     inkscape:cy="82.276843"
+     inkscape:window-width="1398"
+     inkscape:window-height="1020"
+     inkscape:window-x="487"
+     inkscape:window-y="37"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="svg3" />
+  <!-- Avocado Body -->
+  <!-- Avocado Seed -->
+  <!-- Eyes -->
+  <!-- Smile -->
+  <path
+     style="fill:#48801c;fill-opacity:1;stroke-width:1.73576"
+     d="M 56.172248,74.751456 C 116.35129,-23.151811 141.35577,40.890625 140.15347,125.05039 139.70436,156.48721 82.219876,191.06773 47.639381,138.9724 14.515779,89.07191 97.489219,40.170961 56.172248,74.751456 Z"
+     id="path6"
+     sodipodi:nodetypes="cssc" />
+  <path
+     style="fill:#dcdb81;fill-opacity:1;stroke-width:1.15076"
+     d="M 81.096882,57.891272 C 129.01466,12.130232 131.35501,75.98105 128.49475,120.73358 127.55404,135.45224 91.12126,171.7458 61.985747,132.80956 38.195933,101.01723 75.888663,67.824328 81.096882,57.891272 Z"
+     id="path6-0"
+     sodipodi:nodetypes="cssc" />
+  <ellipse
+     style="fill:#9d410a;fill-opacity:1;stroke-width:1.36445"
+     id="path8"
+     cx="92.367401"
+     cy="114.35963"
+     rx="25.097023"
+     ry="25.355755" />
+  <circle
+     style="fill:#ffffff;fill-opacity:1"
+     id="path9"
+     cx="93.014229"
+     cy="59.120308"
+     r="7.373868" />
+  <circle
+     style="fill:#ffffff;fill-opacity:1"
+     id="path9-9"
+     cx="115.65977"
+     cy="63.115135"
+     r="7.373868" />
+  <circle
+     style="fill:#060200;fill-opacity:1;stroke-width:0.315789"
+     id="path9-9-4"
+     cx="113.01682"
+     cy="65.706345"
+     r="2.3285899" />
+  <circle
+     style="fill:#060200;fill-opacity:1;stroke-width:0.315789"
+     id="path9-9-4-8"
+     cx="93.706337"
+     cy="63.104786"
+     r="2.3285899" />
+  <path
+     style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1.3;stroke-dasharray:none;stroke-opacity:1"
+     d="m 81.759379,73.221216 c 16.71707,16.004416 18.364661,11.140349 35.705041,4.139715"
+     id="path10"
+     sodipodi:nodetypes="cc" />
+</svg>
