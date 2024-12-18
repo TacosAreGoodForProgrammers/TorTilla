@@ -5,12 +5,18 @@
 │   │   ├── stage2
 │   │   └── stage3
 │   └── x86
-│       ├── stage1
-│       ├── stage2
-│       └── stage3
+│       ├── stage1(seed)
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       └── stage3(flesh)
+│           └── f
 ├── README.md
 ├── assets
+│   ├── full_tree.log
+│   ├── mascot.jpg
+│   ├── mascot.png
 │   ├── mascot.svg
+│   ├── mascot_ascii.txt
 │   └── tree.log
 ├── common
 │   ├── stage1
@@ -18,4 +24,4 @@
 │   └── stage3
 └── uefi
 
-16 directories, 3 files
+17 directories, 8 files
