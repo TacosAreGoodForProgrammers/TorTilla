@@ -2,20 +2,31 @@
 ├── Arch
 │   ├── arm
 │   │   ├── stage1
+│   │   │   └── .gitkeep
 │   │   ├── stage2
+│   │   │   └── .gitkeep
 │   │   └── stage3
+│   │       └── .gitkeep
 │   └── x86
 │       ├── stage1
+│       │   └── .gitkeep
 │       ├── stage2
+│       │   └── .gitkeep
 │       └── stage3
+│           └── .gitkeep
 ├── README.md
 ├── assets
+│   ├── full_tree.log
 │   ├── mascot.svg
 │   └── tree.log
 ├── common
 │   ├── stage1
+│   │   └── .gitkeep
 │   ├── stage2
+│   │   └── .gitkeep
 │   └── stage3
+│       └── .gitkeep
 └── uefi
+    └── .gitkeep
 
-16 directories, 3 files
+43 directories, 56 files

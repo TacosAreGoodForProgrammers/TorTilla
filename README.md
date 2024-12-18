@@ -5,7 +5,7 @@
 
 ## Overview
 
-Avocado is a taco-themed, multi-stage, multiboot-compliant bootloader designed to support UEFI systems. Inspired by the modularity and flexibility of modern operating systems, Avocado provides a robust foundation for loading kernels efficiently and reliably.
+Avocado is a avocado-themed, multi-stage, multiboot-compliant bootloader designed to support UEFI systems. Inspired by the modularity and flexibility of modern operating systems, Avocado provides a robust foundation for loading kernels efficiently and reliably.
 
 ---
 
@@ -36,14 +36,28 @@ Avocado is a taco-themed, multi-stage, multiboot-compliant bootloader designed t
 
 ## Project Structure
 ```plaitext
-..
+.
 ├── Arch
+│   ├── arm
+│   │   ├── stage1
+│   │   ├── stage2
+│   │   └── stage3
 │   └── x86
+│       ├── stage1
+│       ├── stage2
+│       └── stage3
 ├── README.md
-└── assets
-    ├── mascot.svg
-    └── tree.log
+├── assets
+│   ├── mascot.svg
+│   └── tree.log
+├── common
+│   ├── stage1
+│   ├── stage2
+│   └── stage3
+└── uefi
 
-4 directories, 3 files
+16 directories, 3 files
+
+
 
 ```
