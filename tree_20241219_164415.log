@@ -1,0 +1,511 @@
+Directory structure of .:
+.
+├── Arch
+│   ├── arm
+│   │   ├── stage1
+│   │   ├── stage2
+│   │   └── stage3
+│   └── x86
+│       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       └── stage3(flesh)
+│           └── f
+├── README.md
+├── assets
+│   ├── full_tree.log
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
+│   └── tree.log
+├── common
+│   ├── stage1
+│   ├── stage2
+│   └── stage3
+├── tree_20241219_164415.log
+└── uefi
+
+18 directories, 12 files
+
+Contents of human-readable files:
+
+--- File: ./Arch/x86/stage1(seed)/gpt.s ---
+; gpt.s - Detects GPT on a disk using BIOS interrupts
+; This is Stage 1 of the bootloader (seed.s) for x86 architecture.
+
+BITS 16                 ; Real mode, 16-bit code
+ORG 0x7C00              ; BIOS loads the bootloader here
+
+start:
+    cli                 ; Clear interrupts
+    xor ax, ax          ; Zero out AX
+    mov ds, ax          ; Set data segment to 0
+    mov es, ax          ; Set extra segment to 0
+
+    ; Display a message indicating we're detecting GPT
+    mov si, gpt_msg
+    call print_string
+
+    ; Read GPT Header from LBA 1 (sector 1)
+    mov ah, 0x02        ; BIOS interrupt: Read sectors
+    mov al, 1           ; Read 1 sector
+    mov ch, 0           ; Cylinder 0
+    mov cl, 2           ; Sector 2 (LBA 1)
+    mov dh, 0           ; Head 0
+    mov dl, 0x80        ; Disk 0 (First hard disk)
+    mov bx, 0x600       ; Load GPT Header to 0x0600:0000
+    int 0x13            ; BIOS interrupt to read disk
+
+    jc disk_error       ; If carry flag is set, there's an error reading
+
+    ; Check GPT signature at the beginning of the GPT Header
+    mov si, 0x600       ; Point to the GPT Header (memory location)
+    mov di, gpt_sig     ; The "EFI PART" signature
+    mov cx, 8           ; GPT signature length
+    repe cmpsb          ; Compare the bytes of the signature
+    jz is_gpt           ; If the signature matches, it's GPT
+
+    ; If signature does not match, display error
+    jmp not_gpt_error
+
+is_gpt:
+    ; GPT detected, proceed to load partition entries or Stage 2
+    mov si, gpt_found_msg
+    call print_string
+    ; Proceed to Stage 2 (loading partition entry array)...
+    jmp continue_boot
+
+not_gpt_error:
+    ; Not a GPT disk, handle the error
+    mov si, not_gpt_msg
+    call print_string
+    jmp disk_error
+
+disk_error:
+    mov si, error_msg
+    call print_string
+    hlt                   ; Halt the CPU
+
+print_string:
+    ; Print a null-terminated string pointed to by SI
+    mov ah, 0x0E          ; Teletype output function
+.print_char:
+    lodsb                 ; Load next byte from [SI] into AL
+    or al, al             ; Check if it's null (end of string)
+    jz .done              ; If null, end of string
+    int 0x10              ; BIOS interrupt to print character
+    jmp .print_char
+.done:
+    ret
+
+gpt_msg db "Detecting GPT...", 0
+gpt_sig db "EFI PART", 0       ; GPT Header signature
+gpt_found_msg db "GPT Disk Found.", 0
+not_gpt_msg db "Not a GPT disk!", 0
+error_msg db "Disk read error!", 0
+
+times 510-($-$$) db 0  ; Pad with zeroes to 510 bytes
+dw 0xAA55             ; Boot signature
+
+--- File: ./Arch/x86/stage1(seed)/mbr.s ---
+; mbr.s - Detects MBR on a disk using BIOS interrupts
+; This is Stage 1 of the bootloader (seed.s) for x86 architecture.
+
+BITS 16                 ; Real mode, 16-bit code
+ORG 0x7C00              ; BIOS loads the bootloader here
+
+start:
+    cli                 ; Clear interrupts
+    xor ax, ax          ; Zero out AX
+    mov ds, ax          ; Set data segment to 0
+    mov es, ax          ; Set extra segment to 0
+
+    ; Display a message indicating we're detecting MBR
+    mov si, mbr_msg
+    call print_string
+
+    ; Read MBR (first sector, LBA 0)
+    mov ah, 0x02        ; BIOS interrupt: Read sectors
+    mov al, 1           ; Read 1 sector
+    mov ch, 0           ; Cylinder 0
+    mov cl, 1           ; Sector 1 (LBA 0)
+    mov dh, 0           ; Head 0
+    mov dl, 0x80        ; Disk 0 (First hard disk)
+    mov bx, 0x600       ; Load MBR to 0x0600:0000
+    int 0x13            ; BIOS interrupt to read disk
+
+    jc disk_error       ; If carry flag is set, there's an error reading
+
+    ; Check MBR boot signature (last two bytes: 0xAA55)
+    mov si, 0x600       ; Point to the MBR (memory location)
+    add si, 510         ; Move to the last 2 bytes
+    mov ax, [si]        ; Load the 2-byte signature into AX
+    cmp ax, 0xAA55      ; Check for the boot signature
+    je is_mbr           ; If signature matches, it's MBR
+
+    ; If signature does not match, display error
+    jmp not_mbr_error
+
+is_mbr:
+    ; MBR detected, proceed to load partition entries or Stage 2
+    mov si, mbr_found_msg
+    call print_string
+    ; Proceed to Stage 2 (loading partition entry table)...
+    jmp continue_boot
+
+not_mbr_error:
+    ; Not a valid MBR disk, handle the error
+    mov si, not
+
+--- File: ./Arch/x86/stage1(seed)/seed.s ---
+; seed.s - Detects GPT or MBR on a disk and proceeds to Stage 2 (pit)
+; This is Stage 1 of the bootloader for x86 architecture.
+
+BITS 16                 ; Real mode, 16-bit code
+ORG 0x7C00              ; BIOS loads the bootloader here
+
+start:
+    cli                 ; Clear interrupts
+    xor ax, ax          ; Zero out AX
+    mov ds, ax          ; Set data segment to 0
+    mov es, ax          ; Set extra segment to 0
+
+    ; Display a message indicating we're detecting partition table (GPT/MBR)
+    mov si, detect_msg
+    call print_string
+
+    ; Try reading GPT first (LBA 1, sector 1)
+    mov ah, 0x02        ; BIOS interrupt: Read sectors
+    mov al, 1           ; Read 1 sector
+    mov ch, 0           ; Cylinder 0
+    mov cl, 2           ; Sector 2 (LBA 1)
+    mov dh, 0           ; Head 0
+    mov dl, 0x80        ; Disk 0 (First hard disk)
+    mov bx, 0x600       ; Load GPT Header to 0x0600:0000
+    int 0x13            ; BIOS interrupt to read disk
+
+    jc mbr_detect       ; If carry flag is set, there's an error reading, try MBR
+
+    ; Check GPT signature (EFI PART)
+    mov si, 0x600       ; Point to the GPT Header (memory location)
+    mov di, gpt_sig     ; The "EFI PART" signature
+    mov cx, 8           ; GPT signature length
+    repe cmpsb          ; Compare the bytes of the signature
+    jz is_gpt           ; If the signature matches, it's GPT
+
+mbr_detect:
+    ; If we reach here, GPT was not detected. Try MBR (LBA 0, sector 0)
+    mov ah, 0x02        ; BIOS interrupt: Read sectors
+    mov al, 1           ; Read 1 sector
+    mov ch, 0           ; Cylinder 0
+    mov cl, 1           ; Sector 1 (LBA 0)
+    mov dh, 0           ; Head 0
+    mov dl, 0x80        ; Disk 0 (First hard disk)
+    mov bx, 0x600       ; Load MBR to 0x0600:0000
+    int 0x13            ; BIOS interrupt to read disk
+
+    jc disk_error       ; If carry flag is set, there's an error reading
+
+    ; Check MBR boot signature (last two bytes: 0xAA55)
+    mov si, 0x600       ; Point to the MBR (memory location)
+    add si, 510         ; Move to the last 2 bytes
+    mov ax, [si]        ; Load the 2-byte signature into AX
+    cmp ax, 0xAA55      ; Check for the boot signature
+    je is_mbr           ; If signature matches, it's MBR
+
+    ; If neither GPT nor MBR is detected, display error
+    jmp not_partition_error
+
+is_gpt:
+    ; GPT detected, proceed to Stage 2 (pit) for GPT
+    mov si, gpt_found_msg
+    call print_string
+    ; Proceed to Stage 2 (processing GPT partitions)...
+    jmp continue_boot
+
+is_mbr:
+    ; MBR detected, proceed to Stage 2 (pit) for MBR
+    mov si, mbr_found_msg
+    call print_string
+    ; Proceed to Stage 2 (processing MBR partitions)...
+    jmp continue_boot
+
+not_partition_error:
+    ; Neither GPT nor MBR detected, handle the error
+    mov si, not_partition_msg
+    call print_string
+    jmp disk_error
+
+disk_error:
+    mov si, error_msg
+    call print_string
+    hlt                   ; Halt the CPU
+
+continue_boot:
+    ; Placeholder: Jump to Stage 2 (pit), handling partition entries and kernel loading
+    ; This would involve loading the kernel based on partition entries.
+    ; Here, we'll just loop for now.
+    jmp continue_boot
+
+print_string:
+    ; Print a null-terminated string pointed to by SI
+    mov ah, 0x0E          ; Teletype output function
+.print_char:
+    lodsb                 ; Load next byte from [SI] into AL
+    or al, al             ; Check if it's null (end of string)
+    jz .done              ; If null, end of string
+    int 0x10              ; BIOS interrupt to print character
+    jmp .print_char
+.done:
+    ret
+
+; Messages
+detect_msg db "Detecting GPT or MBR...", 0
+gpt_sig db "EFI PART", 0       ; GPT Header signature
+gpt_found_msg db "GPT Disk Found.", 0
+mbr_found_msg db "MBR Disk Found.", 0
+not_partition_msg db "No valid partition table found!", 0
+error_msg db "Disk read error!", 0
+
+times 510-($-$$) db 0  ; Pad with zeroes to 510 bytes
+dw 0xAA55             ; Boot signature (MBR signature)
+
+--- File: ./Arch/x86/stage3(flesh)/f/.joke ---
+THIS FOLDER IS A JOKE FOLDER THAT I ACCIDENTALLY CREATED
+--- File: ./assets/full_tree.log ---
+.
+├── Arch
+│   ├── arm
+│   │   ├── stage1
+│   │   │   └── .gitkeep
+│   │   ├── stage2
+│   │   │   └── .gitkeep
+│   │   └── stage3
+│   │       └── .gitkeep
+│   └── x86
+│       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       │   └── .gitkeep
+│       └── stage3(flesh)
+│           ├── .gitkeep
+│           └── f
+├── README.md
+├── assets
+│   ├── full_tree.log
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
+│   └── tree.log
+├── common
+│   ├── stage1
+│   │   └── .gitkeep
+│   ├── stage2
+│   │   └── .gitkeep
+│   └── stage3
+│       └── .gitkeep
+└── uefi
+    └── .gitkeep
+
+91 directories, 113 files
+
+--- File: ./assets/mascot/mascot_ascii.txt ---
+                                                 [32mo00xxxxx0;
+                                             .Odc::::::::::lx
+                                           ldc:::::::::::::::cl
+                                         dd::::::::::::::::::::o
+                                       ld::::::::::[33mclooolc[32m::::::c
+                                     'd::::::::[33mldkO0KKKKK0ko[32m:::::c
+                                    x;::::::[33mcdOKKKKKKKKKKKKKOc[32m::::;
+                                  ;l::::::[33moON[0mWWW[33mNXKKKKKKKKKKK0c[32m:::c
+                                 d::::::[33moOK[0mMMMMMMM[33mXKKKKX[0mWWWW[33mNXO[32m::::;
+                               .l:::::[33mcxKKKWMN:lMWKKKKXMWWMMMWKo[32m::::
+                              xc:::::[33md0KKKKKNXodNKKKKKXN;;WMMNK0[32m::::;
+                            'l:::::[33moOKKKKKKKKKKKKKKKKKKKXNNNXKKKl[32m:::;
+                           x::::::[33mxKKKKK0od0KKKKKKKKKKKKKKKKKKKKx[32m::::.
+                         :c:::::[33mlOKKKKKKKKxookKKKKKKKK0xddd0KKKKO[32m::::'
+                        o::::::[33mo0KKKKKKKKKKK0ddddddddddx0KKKKKKK0[32m::::'
+                       o::::::[33mdKKKKKKKKKKKKKKKKK0OO0KKKKKKKKKKKKK[32m::::;
+                      o::::::[33mdKKKKKKKKKKkdolcccclooxOKKKKKKKKKKKK[32m:::::
+                     :::::::[33moKKKKKKKKOo[31m:;,,,,,,,,,,,;[33mcd0KKKKKKKKKc[32m::::.
+                    .:::::::[33m0KKKKKK0o[31m;,,,,,,,,,,,,,,,,,;[33mdKKKKKKKKc[32m::::.
+                    ;::::::[33mdKKKKKK0c[31m,,,,,,,,,,,,,,,,,,,,,[33ml0KKKKKKc[32m::::,
+                    :::::::[33mOKKKKKKc[31m,,,,,,,,,,,,,,,,,,,,,,,[33moKKKKKK[32m:::::,
+                   .:::::::[33m0KKKKKO[31m,,,,,,,,,,,,,,,,,,,,,,,,;[33m0KKKKK[32m:::::.
+                    :::::::[33mOKKKKKx[31m,,,,,,,,,,,,,,,,,,,,,,,,,[33mOKKKK0[32m::::::.
+                    ;::::::[33mdKKKKKO[31m,,,,,,,,,,,,,,,,,,,,,,,,;[33m0KKKKO[32m::::::.
+                    .:::::::[33mOKKKKKl[31m,,,,,,,,,,,,,,,,,,,,,,,[33moKKKKKx[32m::::::.
+                     ,::::::[33mcOKKKK0c[31m,,,,,,,,,,,,,,,,,,,,,[33mlKKKKKO[32m:::::::.
+                      :::::::[33mckKKKKKd[31m;,,,,,,,,,,,,,,,,,:[33mxKKKKKk[32m::::::::
+                       ':::::::[33moOKKKK0xl[31m;,,,,,,,,,;[33mcox0KKKKko:[32m:::::::
+                        .::::::::[33mokKKKKKKOkxdooddxkOKKKKK0kl[32m:::::::::
+                          ,::::::::[33mlx0KKKKKKKKKKKKKKKK0kdc[32m:::::::::'
+                            ;:::::::::[33mldkO0KKKKKK0Okxoc[32m::::::::::;
+                              ;:::::::::::[33mccllllc[32m::::::::::::::,
+                                .::::::::::::::::::::::::::;
+                                    ':::::::::::::::::::
+                                           .'''..
+--- File: ./assets/mascot/mascot_ascii_uncolored.txt ---
+                                                 o00xxxxx0;
+                                             .Odc::::::::::lx
+                                           ldc:::::::::::::::cl
+                                         dd::::::::::::::::::::o
+                                       ld::::::::::clooolc::::::c
+                                     'd::::::::ldkO0KKKKK0ko:::::c
+                                    x;::::::cdOKKKKKKKKKKKKKOc::::;
+                                  ;l::::::oONWWWNXKKKKKKKKKKK0c:::c
+                                 d::::::oOKMMMMMMMXKKKKXWWWWNXO::::;
+                               .l:::::cxKKKWMN:lMWKKKKXMWWMMMWKo::::
+                              xc:::::d0KKKKKNXodNKKKKKXN;;WMMNK0::::;
+                            'l:::::oOKKKKKKKKKKKKKKKKKKKXNNNXKKKl:::;
+                           x::::::xKKKKK0od0KKKKKKKKKKKKKKKKKKKKx::::.
+                         :c:::::lOKKKKKKKKxookKKKKKKKK0xddd0KKKKO::::'
+                        o::::::o0KKKKKKKKKKK0ddddddddddx0KKKKKKK0::::'
+                       o::::::dKKKKKKKKKKKKKKKKK0OO0KKKKKKKKKKKKK::::;
+                      o::::::dKKKKKKKKKKkdolcccclooxOKKKKKKKKKKKK:::::
+                     :::::::oKKKKKKKKOo:;,,,,,,,,,,,;cd0KKKKKKKKKc::::.
+                    .:::::::0KKKKKK0o;,,,,,,,,,,,,,,,,,;dKKKKKKKKc::::.
+                    ;::::::dKKKKKK0c,,,,,,,,,,,,,,,,,,,,,l0KKKKKKc::::,
+                    :::::::OKKKKKKc,,,,,,,,,,,,,,,,,,,,,,,oKKKKKK:::::,
+                   .:::::::0KKKKKO,,,,,,,,,,,,,,,,,,,,,,,,;0KKKKK:::::.
+                    :::::::OKKKKKx,,,,,,,,,,,,,,,,,,,,,,,,,OKKKK0:::::.
+                    ;::::::dKKKKKO,,,,,,,,,,,,,,,,,,,,,,,,;0KKKKO:::::.
+                    .:::::::OKKKKKl,,,,,,,,,,,,,,,,,,,,,,,oKKKKKx:::::.
+                     ,::::::cOKKKK0c,,,,,,,,,,,,,,,,,,,,,lKKKKKO::::::.
+                      :::::::ckKKKKKd;,,,,,,,,,,,,,,,,,:xKKKKKk:::::::
+                       ':::::::oOKKKK0xl:;,,,,,,,,,;cox0KKKKko:::::::
+                        .::::::::okKKKKKKOkxdooddxkOKKKKK0kl::::::::
+                          ,::::::::lx0KKKKKKKKKKKKKKKK0kdc::::::::'
+                            ;:::::::::ldkO0KKKKKK0Okxoc:::::::::;
+                              ;:::::::::::ccllllc:::::::::::::,
+                                .::::::::::::::::::::::::::;
+                                    ':::::::::::::::::::
+                                           .'''..
+--- File: ./assets/tree.log ---
+.
+├── Arch
+│   ├── arm
+│   │   ├── stage1
+│   │   ├── stage2
+│   │   └── stage3
+│   └── x86
+│       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       └── stage3(flesh)
+│           └── f
+├── README.md
+├── assets
+│   ├── full_tree.log
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
+│   └── tree.log
+├── common
+│   ├── stage1
+│   ├── stage2
+│   └── stage3
+└── uefi
+
+18 directories, 11 files
+
+--- File: ./README.md ---
+Here's the updated README with your latest additions and a section for recommendations on Discord channels:
+
+---
+
+# Avocado Bootloader
+
+![Avocado Mascot](./assets/mascot/mascot.svg)  
+*The multi-stage, multi-boot bootloader with UEFI support!*
+
+## Overview
+
+Avocado is an avocado-themed, multi-stage, multiboot-compliant bootloader designed to support UEFI systems. Inspired by the modularity and flexibility of modern operating systems, Avocado provides a robust foundation for loading kernels efficiently and reliably.
+
+---
+
+## Features
+
+- **Multiboot Compliant**  
+  Fully adheres to the multiboot standard for seamless kernel loading.  
+
+- **UEFI Support**  
+  Built for modern systems with native UEFI boot capabilities.  
+
+- **Multi-Stage Boot Process**  
+  A clean and efficient three-stage design:
+  1. **Seed**: Initialization and basic hardware setup.
+  2. **Flesh**: Loading the configuration and environment setup.
+  3. **Pit**: Launching the operating system kernel.
+
+- **Multi-Architecture Support**  
+  Designed to work on multiple architectures, including x86 and ARM.  
+
+- **Customizable**  
+  Easily tailored for various operating systems.  
+
+- **Taco-Themed Fun**  
+  Why be boring when you can be delicious?
+
+---
+
+## Project Structure
+```plaintext
+.
+├── Arch
+│   ├── arm
+│   │   ├── stage1
+│   │   ├── stage2
+│   │   └── stage3
+│   └── x86
+│       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       └── stage3(flesh)
+│           └── f
+├── README.md
+├── assets
+│   ├── full_tree.log
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
+│   └── tree.log
+├── common
+│   ├── stage1
+│   ├── stage2
+│   └── stage3
+└── uefi
+
+18 directories, 11 files
+```
+
+---
+
+## Join Us on Discord!
+
+We are building a community around TacoOs, and we'd love for you to join us on Discord! You can ask questions, share ideas, and get updates on the project.
+
+[Join our Discord](https://discord.gg/4R22B5F4)
+
+---
