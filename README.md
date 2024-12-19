@@ -85,7 +85,3 @@ We are building a community around TacoOs, and we'd love for you to join us on D
 
 **1. Q: What is the `f` folder in Stage 3?**  
 **A:** The `f` folder is a lighthearted addition to the project, initially created accidentally and retained as an inside joke. It contains a `.secret` file and als we will add a bunch of joke assets there, so incase it takes up too much space, you can remove it.
-
----
-
-Would you like me to adjust the tone or content?
