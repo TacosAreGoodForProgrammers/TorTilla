@@ -1,20 +1,11 @@
-; gpt.s - Detects GPT on a disk using BIOS interrupts
-; This is Stage 1 of the bootloader (seed.s) for x86 architecture.
+; gpt_detect.s - Functions for detecting GPT partition tables
+; Part of Stage 1 bootloader for x86 architecture.
 
 BITS 16                 ; Real mode, 16-bit code
-ORG 0x7C00              ; BIOS loads the bootloader here
 
-start:
-    cli                 ; Clear interrupts
-    xor ax, ax          ; Zero out AX
-    mov ds, ax          ; Set data segment to 0
-    mov es, ax          ; Set extra segment to 0
-
-    ; Display a message indicating we're detecting GPT
-    mov si, gpt_msg
-    call print_string
-
-    ; Read GPT Header from LBA 1 (sector 1)
+; Function: Detect GPT partition table
+; Reads the GPT Header from LBA 1 (sector 2) and checks for the "EFI PART" signature
+detect_gpt:
     mov ah, 0x02        ; BIOS interrupt: Read sectors
     mov al, 1           ; Read 1 sector
     mov ch, 0           ; Cylinder 0
@@ -23,54 +14,21 @@ start:
     mov dl, 0x80        ; Disk 0 (First hard disk)
     mov bx, 0x600       ; Load GPT Header to 0x0600:0000
     int 0x13            ; BIOS interrupt to read disk
+    jc .error           ; If carry flag is set, disk read error
 
-    jc disk_error       ; If carry flag is set, there's an error reading
-
-    ; Check GPT signature at the beginning of the GPT Header
-    mov si, 0x600       ; Point to the GPT Header (memory location)
-    mov di, gpt_sig     ; The "EFI PART" signature
-    mov cx, 8           ; GPT signature length
-    repe cmpsb          ; Compare the bytes of the signature
-    jz is_gpt           ; If the signature matches, it's GPT
-
-    ; If signature does not match, display error
-    jmp not_gpt_error
-
-is_gpt:
-    ; GPT detected, proceed to load partition entries or Stage 2
-    mov si, gpt_found_msg
-    call print_string
-    ; Proceed to Stage 2 (loading partition entry array)...
-    jmp continue_boot
-
-not_gpt_error:
-    ; Not a GPT disk, handle the error
-    mov si, not_gpt_msg
-    call print_string
-    jmp disk_error
-
-disk_error:
-    mov si, error_msg
-    call print_string
-    hlt                   ; Halt the CPU
-
-print_string:
-    ; Print a null-terminated string pointed to by SI
-    mov ah, 0x0E          ; Teletype output function
-.print_char:
-    lodsb                 ; Load next byte from [SI] into AL
-    or al, al             ; Check if it's null (end of string)
-    jz .done              ; If null, end of string
-    int 0x10              ; BIOS interrupt to print character
-    jmp .print_char
-.done:
+    ; Check GPT signature (EFI PART)
+    mov si, 0x600       ; Point to GPT Header in memory
+    mov di, gpt_sig     ; Address of the "EFI PART" signature
+    mov cx, 8           ; Length of the GPT signature
+    repe cmpsb          ; Compare signature bytes
+    jz .success         ; If match, GPT is detected
+    stc                 ; Set carry flag to indicate failure
     ret
 
-gpt_msg db "Detecting GPT...", 0
-gpt_sig db "EFI PART", 0       ; GPT Header signature
-gpt_found_msg db "GPT Disk Found.", 0
-not_gpt_msg db "Not a GPT disk!", 0
-error_msg db "Disk read error!", 0
+.success:
+    clc                 ; Clear carry flag to indicate success
+    ret
 
-times 510-($-$$) db 0  ; Pad with zeroes to 510 bytes
-dw 0xAA55             ; Boot signature
+.error:
+    stc                 ; Set carry flag to indicate error
+    ret
