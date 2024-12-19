@@ -1,3 +1,7 @@
+Here's the updated README with your latest additions and a section for recommendations on Discord channels:
+
+---
+
 # Avocado Bootloader
 
 ![Avocado Mascot](./assets/mascot/mascot.svg)  
@@ -5,7 +9,7 @@
 
 ## Overview
 
-Avocado is a avocado-themed, multi-stage, multiboot-compliant bootloader designed to support UEFI systems. Inspired by the modularity and flexibility of modern operating systems, Avocado provides a robust foundation for loading kernels efficiently and reliably.
+Avocado is an avocado-themed, multi-stage, multiboot-compliant bootloader designed to support UEFI systems. Inspired by the modularity and flexibility of modern operating systems, Avocado provides a robust foundation for loading kernels efficiently and reliably.
 
 ---
 
@@ -35,37 +39,46 @@ Avocado is a avocado-themed, multi-stage, multiboot-compliant bootloader designe
 ---
 
 ## Project Structure
-```plaitext
+```plaintext
 .
 ├── Arch
-│   ├── arm
-│   │   ├── stage1
-│   │   ├── stage2
-│   │   └── stage3
-│   └── x86
-│       ├── stage1(seed)
-│       │   ├── gpt.s
-│       │   ├── mbr.s
-│       │   └── seed.s
-│       ├── stage2(pit)
-│       └── stage3(flesh)
-│           └── f
+│   ├── arm
+│   │   ├── stage1
+│   │   ├── stage2
+│   │   └── stage3
+│   └── x86
+│       ├── stage1(seed)
+│       │   ├── gpt.s
+│       │   ├── mbr.s
+│       │   └── seed.s
+│       ├── stage2(pit)
+│       └── stage3(flesh)
+│           └── f
 ├── README.md
 ├── assets
-│   ├── full_tree.log
-│   ├── mascot
-│   │   ├── mascot.jpg
-│   │   ├── mascot.png
-│   │   ├── mascot.svg
-│   │   ├── mascot_ascii.txt
-│   │   └── mascot_ascii_uncolored.txt
-│   └── tree.log
+│   ├── full_tree.log
+│   ├── mascot
+│   │   ├── mascot.jpg
+│   │   ├── mascot.png
+│   │   ├── mascot.svg
+│   │   ├── mascot_ascii.txt
+│   │   └── mascot_ascii_uncolored.txt
+│   └── tree.log
 ├── common
-│   ├── stage1
-│   ├── stage2
-│   └── stage3
+│   ├── stage1
+│   ├── stage2
+│   └── stage3
 └── uefi
 
 18 directories, 11 files
-
 ```
+
+---
+
+## Join Us on Discord!
+
+We are building a community around TacoOs, and we'd love for you to join us on Discord! You can ask questions, share ideas, and get updates on the project.
+
+[Join our Discord](https://discord.gg/4R22B5F4)
+
+---
