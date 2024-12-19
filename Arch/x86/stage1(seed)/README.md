@@ -1,50 +1,36 @@
-; seed.s - Detects GPT or MBR on a disk and proceeds to Stage 2 (pit)
-; This is Stage 1 of the bootloader for x86 architecture.
-; Written for BIOS-based systems in 16-bit real mode.
+### Key Functions of Stage 1
+1. **Initialize Real Mode Environment:**
+   - Clears interrupts and sets segment registers (`DS`, `ES`) to 0.
+   - Prepares for disk operations and basic string handling.
 
-BITS 16                 ; Real mode, 16-bit code
-ORG 0x7C00              ; BIOS loads the bootloader here
+2. **Detect Partition Table Type (GPT or MBR):**
+   - Attempts to read the **GPT Header** from Logical Block Address (LBA) 1 (sector 2).
+   - Verifies the **GPT signature** (`"EFI PART"`) to confirm a GPT disk.
+   - If GPT is not found, reads the **MBR** from LBA 0 (sector 1).
+   - Checks the **MBR boot signature** (`0xAA55`) to confirm an MBR disk.
 
-; Entry point
-start:
-    cli                 ; Disable interrupts for safe initialization
-    xor ax, ax          ; Zero out AX register
-    mov ds, ax          ; Set data segment to 0
-    mov es, ax          ; Set extra segment to 0
+3. **Output Status Messages:**
+   - Displays appropriate messages for detection outcomes:
+     - `"GPT Disk Found."` if GPT is detected.
+     - `"MBR Disk Found."` if MBR is detected.
+     - `"No valid partition table found!"` if neither is detected.
+     - `"Disk read error!"` for any disk read failure.
 
-    ; Display a message indicating we're detecting partition table (GPT/MBR)
-    mov si, detect_msg
-    call print_string
+4. **Error Handling:**
+   - If a disk read fails (carry flag set), it jumps to a `disk_error` handler and halts the system.
+   - If neither GPT nor MBR is detected, an error message is displayed, and execution halts.
 
-    ; Attempt to detect GPT partition table
-    call detect_gpt
-    jc detect_mbr        ; If error reading GPT, jump to MBR detection
+5. **Prepare for Stage 2:**
+   - Placeholder `continue_boot` points to the next stage (`pit`) where partitions are processed and the kernel is loaded.
 
-    ; GPT detected
-    mov si, gpt_found_msg
-    call print_string
-    jmp continue_boot
+---
 
-detect_mbr:
-    ; Attempt to detect MBR partition table
-    call detect_mbr_table
-    jc disk_error        ; If error reading MBR, jump to error handler
+### Planned Enhancements
+- **Additional Documentation:** Add comments explaining:
+  - Key registers used (e.g., `AH`, `AL`, `CH`, etc.).
+  - Memory locations (`0x600`) and their purposes.
+  - BIOS interrupt specifics (e.g., `INT 0x13` and `INT 0x10`).
+- **Improved Error Handling:** Distinguish between GPT and MBR read errors and undefined partition table errors.
+- **Stage 2 Integration:** Provide placeholders or hooks for loading and processing partitions.
+- **Refactor Code Structure:** Separate GPT and MBR detection routines for clarity and modularity.
 
-    ; MBR detected
-    mov si, mbr_found_msg
-    call print_string
-    jmp continue_boot
-
-disk_error:
-    ; Handle disk read error
-    mov si, error_msg
-    call print_string
-    hlt                 ; Halt the CPU
-
-continue_boot:
-    ; Placeholder: Jump to Stage 2 (pit), handling partition entries and kernel loading
-    ; Infinite loop for now
-    jmp continue_boot
-
-times 510-($-$$) db 0  ; Pad with zeroes to make the bootloader 510 bytes
-dw 0xAA55              ; Boot signature (required for bootable disks)
